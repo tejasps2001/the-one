@@ -24,8 +24,12 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
     private int offset;
     private GranularMovement granularMM;
     private Coord initLoc;
+    private Coord lastLoc;
     private Path nextPath;
-    private prevLocation;
+
+    private String horizontalDirection;
+    private String verticalDirection;
+    private int connectionDownCount;
 
     private DTNHost host;
     private int hostCounter;
@@ -56,6 +60,11 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
     public LawnmoverMovement(LawnmoverMovement lm) {
         super(lm);
         granularMM.setLocation(initLoc);
+        
+        // default initial values for movement
+        horizontalDirection = "left";
+        verticalDirection = "up";
+        connectionDownCount = 0;
     }
 
     public boolean newOrders() {
@@ -82,12 +91,28 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
 
         if(fogConnection != null) {
             if(fogConnection.isUp() == false && granularMM.isReady()) {
+                connectionDownCount++;
+                // switch vertical direction
+                verticalDirection = (verticalDirection == "up") ? "down" : "up";
+                
+                if (connectionDownCount > 1) {
+                    // switch horizontal direction
+                    if (horizontalDirection == "left") {
+                        horizontalDirection = "right";
+                    } else if (horizontalDirection == "right") {
+                        // stop
+                    }
+                    
+                    // return to the fog vehicle
+                }
 
-            }
-            else {
-                d
-                granularMM.generateNextPath("up");
-
+                // generate path in horizontal direction then vertical direction
+                granularMM.generateNextPath(verticalDirection);
+            } else {
+                connectionDownCount = 0;
+                
+                // generate a new path
+                granularMM.generateNextPath(verticalDirection);
             }
         }
         return true;
@@ -102,4 +127,32 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
 	public MovementModel replicate() {
 		return new LawnmoverMovement(this);
 	}
+
+    /**
+    * Tell the movment model what its current location is
+    * @param lastWaypoint
+    */
+    public void setLocation(Coord lastWaypoint) {
+        this.initLoc = lastWaypoint.clone();
+    }
+    
+    /**
+	 * Checks if the movement model is finished doing its task and it's time to
+	 * switch to the next movement model. The method should be called between
+	 * getPath() calls.
+	 * @return true if ready
+	 */
+	@Override
+	public boolean isReady() {
+	    return true;
+	}
+
+    /**
+	 * Get the last location the getPath() of this movement model has returned
+	 * @return the last location
+	 */
+    @Override
+	public Coord getLastLocation() {
+    return this.lastLoc;
+  }
 }
