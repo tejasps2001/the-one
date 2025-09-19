@@ -213,6 +213,13 @@ public class DTNHost implements Comparable<DTNHost> {
 	}
 
 	/**
+	 * Returns the Node's name (groupId + netAddress)
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
 	 * Sets the Node's name overriding the default name (groupId + netAddress)
 	 * @param name The name to set
 	 */

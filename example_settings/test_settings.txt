@@ -1,0 +1,26 @@
+# Scenario Name
+Scenario.name = simplest_scenario
+Scenario.simulateConnections = true
+Scenario.updateInterval = 0.1
+Scenario.endTime = 4200
+
+Scenario.nrofHostGroups = 2
+
+Group.nrofInterfaces = 1
+Group.interface1 = highspeedInterface
+highspeedInterface.transmitRange = 50
+
+# Drones
+Group1.groupID = m
+Group1.nrofHosts = 2
+Group1.movementModel = TestMovement
+
+
+Group.nrofHosts = 1
+Events.nrof = 0 
+
+# Fog Vehicle
+Group2.groupID = p
+Group2.nodeLocation = 150, 150
+Group2.nrofHosts = 1
+Group2.movementModel = StationaryMovement
