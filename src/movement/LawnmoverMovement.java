@@ -1,7 +1,7 @@
 package movement;
 
 import java.util.List;
-
+import java.util.ArrayList;
 import core.Connection;
 import core.Coord;
 import core.DTNHost;
@@ -59,8 +59,11 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
     */
     public LawnmoverMovement(LawnmoverMovement lm) {
         super(lm);
-        granularMM.setLocation(initLoc);
+        this.granularMM = new GranularMovement(lm.granularMM);
+        this.initLoc = lm.startLoc;
+        // this.granularMM.setLocation(initLoc);
         
+        setCurrentMovementModel(granularMM);
         // default initial values for movement
         horizontalDirection = "left";
         verticalDirection = "up";
@@ -88,7 +91,7 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
                 break;
             }
         }
-
+        
         if(fogConnection != null) {
             if(fogConnection.isUp() == false && granularMM.isReady()) {
                 connectionDownCount++;
@@ -101,13 +104,17 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
                         horizontalDirection = "right";
                     } else if (horizontalDirection == "right") {
                         // stop
+                        return false;
                     }
                     
                     // return to the fog vehicle
                 }
 
                 // generate path in horizontal direction then vertical direction
-                granularMM.generateNextPath(verticalDirection);
+                List<String> directions = new ArrayList<String>();
+                directions.add(horizontalDirection);
+                directions.add(verticalDirection);
+                granularMM.generateNextPath(directions);
             } else {
                 connectionDownCount = 0;
                 
@@ -115,6 +122,7 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
                 granularMM.generateNextPath(verticalDirection);
             }
         }
+        
         return true;
     }
 
@@ -153,6 +161,6 @@ public class LawnmoverMovement extends ExtendedMovementModel implements Switchab
 	 */
     @Override
 	public Coord getLastLocation() {
-    return this.lastLoc;
-  }
+        return this.lastLoc;
+    }
 }

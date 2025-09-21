@@ -1,5 +1,6 @@
 package movement;
 
+import java.util.List;
 import core.Coord;
 import core.Settings;
 import movement.MovementModel;
@@ -51,6 +52,7 @@ public class GranularMovement extends MovementModel implements SwitchableMovemen
     this.nextPath = new Path(generateSpeed());
     this.nextPath.addWaypoint(initLoc);
     this.lastLoc = gm.startLoc;
+    this.offset = gm.offset;
   }
 
   /**
@@ -61,8 +63,10 @@ public class GranularMovement extends MovementModel implements SwitchableMovemen
    */
   public Path generateNextPath(String direction) {
     this.nextPath = new Path(generateSpeed());
-    double x = this.initLoc.getX();
-    double y = this.initLoc.getY();
+    double x = this.lastLoc.getX();
+    double y = this.lastLoc.getY();
+    this.nextPath.addWaypoint(new Coord(x, y));
+    
     switch (direction) {
       case "up":
         y += offset;        
@@ -81,6 +85,43 @@ public class GranularMovement extends MovementModel implements SwitchableMovemen
     }
     Coord nextPoint = new Coord(x, y);
     this.nextPath.addWaypoint(nextPoint);
+    this.lastLoc = nextPoint;
+    return this.nextPath;
+  }
+  
+  /**
+   * Generate a new path which makes the node move in the
+   * directions specified by an offset.
+   * @param directions list of directions
+   * @return the generated path 
+   */
+  public Path generateNextPath(List<String> directions) {
+    this.nextPath = new Path(generateSpeed());
+    double x = this.initLoc.getX();
+    double y = this.initLoc.getY();
+    Coord nextPoint = null;
+    for (String direction : directions) {
+      switch (direction) {
+        case "up":
+          y += offset;        
+          break;
+        case "right":
+          x += offset;
+          break;
+        case "down":
+          y -= offset;
+        break;
+        case "left":
+          x -= offset;
+        break;
+        default:
+          break;
+      }
+      
+      nextPoint = new Coord(x, y);
+      this.nextPath.addWaypoint(nextPoint);
+    }
+    
     this.lastLoc = nextPoint;
     return this.nextPath;
   }
